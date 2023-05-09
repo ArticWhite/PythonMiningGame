@@ -4,6 +4,8 @@ class Charater:
     coal = 0
     iron = 0
     gold = 0
+    ironIngot=0
+
     def __init__(self, mode='EASY'):
         self.HP = 3
     
@@ -15,3 +17,9 @@ class Charater:
         self.iron+=1
     def addGold(self):
         self.gold+=1
+    def smeltIron(self):
+        if (self.iron>=1 and self.coal >= 1):
+            self.iron-=1
+            self.coal-=1
+            self.ironIngot+=1
+            print(self.ironIngot)

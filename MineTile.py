@@ -10,13 +10,14 @@ from pygame.locals import (
     K_ESCAPE,
     KEYDOWN,
     QUIT,
+    K_i,
 )
-X = 500
-Y = 500
+X = 800
+Y = 800
 white = (255, 255, 255)
 green = (0, 255, 0)
 blue = (0, 0, 128)
-mapSize = 8
+mapSize = 12
 #game object stone #, coal *, iron @, gold $
 #map tile probablity
 probability=[75,87,97,99,100]
@@ -28,7 +29,7 @@ charPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
 stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
 while (stairsPos==charPos):
     stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
-def resourcesText():
+def resourcesText(font):
     text = font.render('Stone: {} Coal: {}, Iron: {} Gold: {}'.format(Player.stone,Player.coal,Player.iron,Player.gold), True, green, blue) 
     textRect = text.get_rect()
     textRect.center = (X // 3, Y -25)
@@ -99,6 +100,7 @@ def moveRight(charPos,gameMap):
         if (mineBlock((charPos[0]+1,charPos[1]),gameMap)):
             charPos[0]+=1
 
+#helper method for smelting ore for buttons
 #character class generated
 Player = PlayerClass.Charater()
 pygame.init()
@@ -110,6 +112,7 @@ font = pygame.font.Font('freesansbold.ttf', 10)
 #set up the drawing screen
 screen = pygame.display.set_mode([X, Y])
 running = True
+
 
 while running:
     # Did the user click the window close button?
@@ -135,6 +138,7 @@ while running:
                 pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
     
     pygame.draw.circle(screen, (0, 100, 5), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
+    resourcesText(font)
     # Look at every event in the queue
     for event in pygame.event.get():
         if event.type == KEYDOWN:
@@ -149,8 +153,68 @@ while running:
                 moveLeft(charPos,gameMap)
             elif event.key == K_RIGHT:
                 moveRight(charPos,gameMap)
+            elif event.key == K_i:
+                inInv=True
+                fpsClock = pygame.time.Clock()
+                #inventory
+                while inInv:
+                    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
+                    for event in pygame.event.get():
+                        if event.type == KEYDOWN:
+                        # Was it the Escape key? If so, stop the loop.
+                            if event.key == K_i:
+                                inInv = False
+                    fontInv = pygame.font.SysFont('Arial', 40)
+                    
+                    objects = []
+
+                    class Button():
+                        def __init__(self, x, y, width, height, buttonText='Button', onclickFunction=None, onePress=False):
+                            self.x = x
+                            self.y = y
+                            self.width = width
+                            self.height = height
+                            self.onclickFunction = onclickFunction
+                            self.onePress = onePress
+                            self.alreadyPressed = False
+
+                            self.fillColors = {
+                                'normal': '#ffffff',
+                                'hover': '#666666',
+                                'pressed': '#333333',
+                            }
+                            self.buttonSurface = pygame.Surface((self.width, self.height))
+                            self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
+
+                            self.buttonSurf = fontInv.render(buttonText, True, (20, 20, 20))
+                            objects.append(self)
+                        def process(self):
+                            mousePos = pygame.mouse.get_pos()
+                            self.buttonSurface.fill(self.fillColors['normal'])
+                            if self.buttonRect.collidepoint(mousePos):
+                                self.buttonSurface.fill(self.fillColors['hover'])
+                                if pygame.mouse.get_pressed(num_buttons=3)[0]:
+                                    self.buttonSurface.fill(self.fillColors['pressed'])
+                                    if self.onePress:
+                                        self.onclickFunction()
+                                    elif not self.alreadyPressed:
+                                        self.onclickFunction()
+                                        self.alreadyPressed = True
+                                else:
+                                    self.alreadyPressed = False
+                            self.buttonSurface.blit(self.buttonSurf, [
+                                self.buttonRect.width/2 - self.buttonSurf.get_rect().width/2,
+                                self.buttonRect.height/2 - self.buttonSurf.get_rect().height/2
+                            ])
+                            screen.blit(self.buttonSurface, self.buttonRect)
+                                
+                    resourcesText(font)
+                    Button(30, 30, 400, 100, 'Smelt Iron', Player.smeltIron)
+                    for object in objects:
+                        object.process()
+                    pygame.display.flip()
+                    fpsClock.tick(60)
         #resourced text
-    resourcesText()
     
     # Flip the display
     pygame.display.flip()
