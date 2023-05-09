@@ -2,7 +2,6 @@ import PlayerClass
 import numpy as np
 import pygame
 import random
-mapSize = 8
 from pygame.locals import (
     K_UP,
     K_DOWN,
@@ -12,40 +11,60 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
+mapSize = 8
 #game object stone #, coal *, iron @, gold $
-gameObjects=['#','*','@','$','']
 #map tile probablity
-probablity=[75,87,97,99,100]
+probability=[75,87,97,99,100]
+# objects 0 is stone, 1 is coal, 2 is iron, 3 gold 4 is open space, and 5 is stairs
 #map array generating
 gameMap = np.zeros((mapSize,mapSize))
-charPos=[0,0]
+#create player position and next level stair positon
+charPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
+stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
+while (stairsPos==charPos):
+    stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
 #map generating
-for i in range(mapSize):
-    for j in range(mapSize):
-        number = random.randint(1,100)
-        if ((i != charPos[0]) or (j != charPos[1])):
-            if probablity[0]>=number:
-                gameMap[i][j]=0
-            elif probablity[1]>=number:
-                gameMap[i][j]=1
-            elif probablity[2]>=number:
-                gameMap[i][j]=2
-            elif probablity[3]>=number:
-                gameMap[i][j]=3
-            elif probablity[4]>=number:
+def lvlGen():
+    stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
+    while (stairsPos==charPos):
+        stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
+    generateMap(charPos,stairsPos,mapSize,gameMap,probability)
+    return charPos
+
+def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
+    for i in range(mapSize):
+        for j in range(mapSize):
+            number = random.randint(1,100)
+            if ((i != charPos[0]) or (j != charPos[1])):
+                if probability[0]>=number:
+                    gameMap[i][j]=0
+                elif probability[1]>=number:
+                    gameMap[i][j]=1
+                elif probability[2]>=number:
+                    gameMap[i][j]=2
+                elif probability[3]>=number:
+                    gameMap[i][j]=3
+                elif probability[4]>=number:
+                    gameMap[i][j]=4
+            else:
                 gameMap[i][j]=4
-        else:
-            gameMap[i][j]=4
+    gameMap[stairsPos[0]][stairsPos[1]]=5
+generateMap(charPos,stairsPos,mapSize,gameMap,probability)
+
 #character class generated
 Player = PlayerClass.Charater()
 pygame.init()
 #checks to see if block is moveable to or has to be mined
 def mineBlock(movingTo,gameMap):
-    if (gameMap[movingTo[0]][movingTo[1]]==4):
-        return True
-    else:
-        gameMap[movingTo[0]][movingTo[1]]=4
-        return False
+    if (gameMap[movingTo[0]][movingTo[1]]==5):
+        charPos = lvlGen()
+    else: 
+        if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
+            return True
+        else:
+            gameMap[movingTo[0]][movingTo[1]]=4
+            return False
+    
     
 def moveUp(charPos,gameMap):
     if (charPos[1]!=0):
@@ -88,6 +107,9 @@ while running:
                 pygame.draw.rect(screen, (255, 215, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
             elif gameMap[i][j]==4:
                 pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+            elif gameMap[i][j]==5:
+                pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+    
     pygame.draw.circle(screen, (0, 100, 5), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
     # Look at every event in the queue
     for event in pygame.event.get():
