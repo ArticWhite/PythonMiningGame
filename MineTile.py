@@ -11,6 +11,11 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
+X = 500
+Y = 500
+white = (255, 255, 255)
+green = (0, 255, 0)
+blue = (0, 0, 128)
 mapSize = 8
 #game object stone #, coal *, iron @, gold $
 #map tile probablity
@@ -23,6 +28,11 @@ charPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
 stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
 while (stairsPos==charPos):
     stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
+def resourcesText():
+    text = font.render('Stone: {} Coal: {}, Iron: {} Gold: {}'.format(Player.stone,Player.coal,Player.iron,Player.gold), True, green, blue) 
+    textRect = text.get_rect()
+    textRect.center = (X // 3, Y -25)
+    screen.blit(text, textRect)
 #map generating
 def lvlGen():
     stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
@@ -50,22 +60,28 @@ def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
                 gameMap[i][j]=4
     gameMap[stairsPos[0]][stairsPos[1]]=5
 generateMap(charPos,stairsPos,mapSize,gameMap,probability)
-
-#character class generated
-Player = PlayerClass.Charater()
-pygame.init()
 #checks to see if block is moveable to or has to be mined
 def mineBlock(movingTo,gameMap):
     if (gameMap[movingTo[0]][movingTo[1]]==5):
+        #if the block is stairs go down
         charPos = lvlGen()
     else: 
         if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
             return True
         else:
+            #adding collected material to inventory
+            if gameMap[movingTo[0]][movingTo[1]] == 0:
+                Player.addStone()
+            if gameMap[movingTo[0]][movingTo[1]] == 1:
+                Player.addCoal()
+            if gameMap[movingTo[0]][movingTo[1]] == 2:
+                Player.addIron()
+            if gameMap[movingTo[0]][movingTo[1]] == 3:
+                Player.addGold()
             gameMap[movingTo[0]][movingTo[1]]=4
             return False
     
-    
+#movement controls for the player
 def moveUp(charPos,gameMap):
     if (charPos[1]!=0):
         if (mineBlock((charPos[0],charPos[1]-1),gameMap)):
@@ -83,8 +99,16 @@ def moveRight(charPos,gameMap):
         if (mineBlock((charPos[0]+1,charPos[1]),gameMap)):
             charPos[0]+=1
 
+#character class generated
+Player = PlayerClass.Charater()
+pygame.init()
+#game title
+pygame.display.set_caption('Mine Tile')
+#game font text
+font = pygame.font.Font('freesansbold.ttf', 10)
+
 #set up the drawing screen
-screen = pygame.display.set_mode([500, 500])
+screen = pygame.display.set_mode([X, Y])
 running = True
 
 while running:
@@ -125,6 +149,9 @@ while running:
                 moveLeft(charPos,gameMap)
             elif event.key == K_RIGHT:
                 moveRight(charPos,gameMap)
+        #resourced text
+    resourcesText()
+    
     # Flip the display
     pygame.display.flip()
 # Done! Time to quit.
