@@ -1,7 +1,9 @@
 import PlayerClass
+from ButtonClass import Button
 import numpy as np
 import pygame
 import random
+import time
 from pygame.locals import (
     K_UP,
     K_DOWN,
@@ -145,17 +147,8 @@ while running:
             # Was it the Escape key? If so, stop the loop.
             if event.key == K_ESCAPE:
                 running = False
-            elif event.key == K_UP:
-                moveUp(charPos,gameMap)
-            elif event.key == K_DOWN:
-                moveDown(charPos,gameMap)
-            elif event.key == K_LEFT:
-                moveLeft(charPos,gameMap)
-            elif event.key == K_RIGHT:
-                moveRight(charPos,gameMap)
             elif event.key == K_i:
                 inInv=True
-                fpsClock = pygame.time.Clock()
                 #inventory
                 while inInv:
                     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
@@ -164,58 +157,30 @@ while running:
                         # Was it the Escape key? If so, stop the loop.
                             if event.key == K_i:
                                 inInv = False
-                    fontInv = pygame.font.SysFont('Arial', 40)
-                    
+                    #buttons created here for inventory
                     objects = []
-
-                    class Button():
-                        def __init__(self, x, y, width, height, buttonText='Button', onclickFunction=None, onePress=False):
-                            self.x = x
-                            self.y = y
-                            self.width = width
-                            self.height = height
-                            self.onclickFunction = onclickFunction
-                            self.onePress = onePress
-                            self.alreadyPressed = False
-
-                            self.fillColors = {
-                                'normal': '#ffffff',
-                                'hover': '#666666',
-                                'pressed': '#333333',
-                            }
-                            self.buttonSurface = pygame.Surface((self.width, self.height))
-                            self.buttonRect = pygame.Rect(self.x, self.y, self.width, self.height)
-
-                            self.buttonSurf = fontInv.render(buttonText, True, (20, 20, 20))
-                            objects.append(self)
-                        def process(self):
-                            mousePos = pygame.mouse.get_pos()
-                            self.buttonSurface.fill(self.fillColors['normal'])
-                            if self.buttonRect.collidepoint(mousePos):
-                                self.buttonSurface.fill(self.fillColors['hover'])
-                                if pygame.mouse.get_pressed(num_buttons=3)[0]:
-                                    self.buttonSurface.fill(self.fillColors['pressed'])
-                                    if self.onePress:
-                                        self.onclickFunction()
-                                    elif not self.alreadyPressed:
-                                        self.onclickFunction()
-                                        self.alreadyPressed = True
-                                else:
-                                    self.alreadyPressed = False
-                            self.buttonSurface.blit(self.buttonSurf, [
-                                self.buttonRect.width/2 - self.buttonSurf.get_rect().width/2,
-                                self.buttonRect.height/2 - self.buttonSurf.get_rect().height/2
-                            ])
-                            screen.blit(self.buttonSurface, self.buttonRect)
-                                
                     resourcesText(font)
-                    Button(30, 30, 400, 100, 'Smelt Iron', Player.smeltIron)
+                    b1 = Button(30, 30, 400, 100, screen, 'Smelt Iron', Player.smeltIron)
+                    objects.append(b1)
                     for object in objects:
                         object.process()
                     pygame.display.flip()
-                    fpsClock.tick(60)
-        #resourced text
+                    #resourced text
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_UP]:
+        moveUp(charPos,gameMap)
+        time.sleep(0.2)
+    if keys[pygame.K_DOWN]:
+        moveDown(charPos,gameMap)
+        time.sleep(0.2)
+    if keys[pygame.K_LEFT]:
+        moveLeft(charPos,gameMap)
+        time.sleep(0.2)
+    if keys[pygame.K_RIGHT]:
+        moveRight(charPos,gameMap)
+        time.sleep(0.2)
     
+
     # Flip the display
     pygame.display.flip()
 # Done! Time to quit.
