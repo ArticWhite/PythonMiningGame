@@ -36,6 +36,11 @@ def resourcesText(font):
     textRect = text.get_rect()
     textRect.center = (X // 3, Y -25)
     screen.blit(text, textRect)
+def inventoryText(font):
+    text = font.render('Iron Ignots: {} Gold Ingots: {}'.format(Player.ironIngot,Player.goldIngot), True, green, blue) 
+    textRect = text.get_rect()
+    textRect.center = (X // 3, Y -50)
+    screen.blit(text, textRect)
 #map generating
 def lvlGen():
     stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
@@ -115,7 +120,6 @@ font = pygame.font.Font('freesansbold.ttf', 10)
 screen = pygame.display.set_mode([X, Y])
 running = True
 
-
 while running:
     # Did the user click the window close button?
     for event in pygame.event.get():
@@ -160,8 +164,11 @@ while running:
                     #buttons created here for inventory
                     objects = []
                     resourcesText(font)
-                    b1 = Button(30, 30, 400, 100, screen, 'Smelt Iron', Player.smeltIron)
+                    inventoryText(font)
+                    b1 = Button(30, 50, 400, 100, screen, 'Smelt Iron', Player.smeltIron)
+                    b2 = Button(30, 150, 400, 100, screen, 'Smelt Gold', Player.smeltGold)
                     objects.append(b1)
+                    objects.append(b2)
                     for object in objects:
                         object.process()
                     pygame.display.flip()
