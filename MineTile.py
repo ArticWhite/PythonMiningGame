@@ -41,6 +41,34 @@ def inventoryText(font):
     textRect = text.get_rect()
     textRect.center = (X // 3, Y -50)
     screen.blit(text, textRect)
+def playerHP(font):
+    text = font.render('HP:'+"@"*Player.HP, True, green, blue) 
+    textRect = text.get_rect()
+    textRect.center = (100, 20)
+    screen.blit(text, textRect)
+    #battle screen for combat
+def fightScreen():
+    battling = True
+    buttonsFight=[]
+    def runAway():
+        battling = False
+    while battling:
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+            # Was it the Escape key? If so, stop the loop.
+                if event.key == K_ESCAPE:
+                    battling = False
+        playerHP(font)
+        b1 = Button(100, Y - 75 , 200, 50, screen, 'Attack', Player.smeltIron)
+        b2 = Button(325, Y - 75, 200, 50, screen, 'RUN', runAway)
+        buttonsFight.append(b1)
+        buttonsFight.append(b2)
+        for button in buttonsFight:
+            button.process()
+        pygame.display.flip()
+
+    
 #map generating
 def lvlGen():
     stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
@@ -54,16 +82,25 @@ def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
         for j in range(mapSize):
             number = random.randint(1,100)
             if ((i != charPos[0]) or (j != charPos[1])):
+                #spawn stone
                 if probability[0]>=number:
                     gameMap[i][j]=0
+                #spawn coal
                 elif probability[1]>=number:
                     gameMap[i][j]=1
+                #spawn iron
                 elif probability[2]>=number:
                     gameMap[i][j]=2
+                #spawn gold
                 elif probability[3]>=number:
                     gameMap[i][j]=3
+                #spawn open space or goblin
                 elif probability[4]>=number:
-                    gameMap[i][j]=4
+                    num=random.randint(1,2)
+                    if (num == 1):
+                        gameMap[i][j]=4
+                    else:
+                        gameMap[i][j]=6
             else:
                 gameMap[i][j]=4
     gameMap[stairsPos[0]][stairsPos[1]]=5
@@ -76,6 +113,10 @@ def mineBlock(movingTo,gameMap):
     else: 
         if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
             return True
+        elif gameMap[movingTo[0]][movingTo[1]]==6:
+            fightScreen()
+            return False
+            
         else:
             #adding collected material to inventory
             if gameMap[movingTo[0]][movingTo[1]] == 0:
@@ -121,12 +162,13 @@ screen = pygame.display.set_mode([X, Y])
 running = True
 
 while running:
+    screen.fill((0, 0, 0))
     # Did the user click the window close button?
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     # Fill the background with white
-    screen.fill((0, 0, 0))
+    
     # Draw map tiles
     for i in range(0,mapSize,1):
         for j in range(0,mapSize,1):
@@ -142,9 +184,12 @@ while running:
                 pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
             elif gameMap[i][j]==5:
                 pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-    
+            elif gameMap[i][j]==6:
+                pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                pygame.draw.circle(screen, (200, 0, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
     pygame.draw.circle(screen, (0, 100, 5), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
     resourcesText(font)
+    playerHP(font)
     # Look at every event in the queue
     for event in pygame.event.get():
         if event.type == KEYDOWN:
