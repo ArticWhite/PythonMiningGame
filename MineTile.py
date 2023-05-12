@@ -47,12 +47,15 @@ def playerHP(font):
     textRect.center = (100, 20)
     screen.blit(text, textRect)
     #battle screen for combat
-def fightScreen():
+def attack():
+    print("works")
+def fightScreen(monster):
     battling = True
-    buttonsFight=[]
     def runAway():
-        battling = False
+        battling=False
+    
     while battling:
+        objects=[]
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
         for event in pygame.event.get():
             if event.type == KEYDOWN:
@@ -60,11 +63,11 @@ def fightScreen():
                 if event.key == K_ESCAPE:
                     battling = False
         playerHP(font)
-        b1 = Button(100, Y - 75 , 200, 50, screen, 'Attack', Player.smeltIron)
-        b2 = Button(325, Y - 75, 200, 50, screen, 'RUN', runAway)
-        buttonsFight.append(b1)
-        buttonsFight.append(b2)
-        for button in buttonsFight:
+        b1 = Button(100, Y - 75 , 200, 50, screen, 'Attack', attack)
+        #b2 = Button(325, Y - 75, 200, 50, screen, 'RUN', runAway)
+        objects.append(b1)
+        #objects.append(b2)
+        for button in objects:
             button.process()
         pygame.display.flip()
 
@@ -114,7 +117,7 @@ def mineBlock(movingTo,gameMap):
         if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
             return True
         elif gameMap[movingTo[0]][movingTo[1]]==6:
-            fightScreen()
+            fightScreen(monster=gameMap[movingTo[0]][movingTo[1]])
             return False
             
         else:

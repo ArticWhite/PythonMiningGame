@@ -33,6 +33,7 @@ class Button():
                                     self.buttonSurface.fill(self.fillColors['pressed'])
                                     if self.onePress:
                                         self.onclickFunction()
+                                        
                                     elif not self.alreadyPressed:
                                         self.onclickFunction()
                                         time.sleep(0.1)
