@@ -1,5 +1,6 @@
 import PlayerClass
 from ButtonClass import Button
+import MonsterClass
 import numpy as np
 import pygame
 import random
@@ -14,8 +15,8 @@ from pygame.locals import (
     QUIT,
     K_i,
 )
-X = 800
-Y = 800
+X = 650
+Y = 650
 white = (255, 255, 255)
 green = (0, 255, 0)
 blue = (0, 0, 128)
@@ -41,20 +42,36 @@ def inventoryText(font):
     textRect = text.get_rect()
     textRect.center = (X // 3, Y -50)
     screen.blit(text, textRect)
+#player HP bar
 def playerHP(font):
     text = font.render('HP:'+"@"*Player.HP, True, green, blue) 
     textRect = text.get_rect()
     textRect.center = (100, 20)
     screen.blit(text, textRect)
     #battle screen for combat
-def attack():
-    print("works")
+def monsterHP(enemy,font):
+    text = font.render('Enemy HP:'+"@"*enemy.HP, True, green, blue) 
+    textRect = text.get_rect()
+    textRect.center = (400, 20)
+    screen.blit(text, textRect)   
+
 def fightScreen(monster):
     battling = True
+    enemy=None
+    if (monster==6):
+        enemy = MonsterClass.Goblin(1,3)
     def runAway():
         battling=False
+    def attack():
+        time.sleep(0.1)
+        enemy.HP-=Player.showATK()
+        Player.HP-=enemy.showATK()
     
-    while battling:
+    while battling and (Player.HP > 0 and enemy.HP > 0):
+        if (Player.showHP() == 0):
+            return False
+        if (enemy.showHP() == 0):
+            return True
         objects=[]
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
         for event in pygame.event.get():
@@ -63,6 +80,7 @@ def fightScreen(monster):
                 if event.key == K_ESCAPE:
                     battling = False
         playerHP(font)
+        monsterHP(enemy,font)
         b1 = Button(100, Y - 75 , 200, 50, screen, 'Attack', attack)
         #b2 = Button(325, Y - 75, 200, 50, screen, 'RUN', runAway)
         objects.append(b1)
@@ -110,15 +128,18 @@ def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
 generateMap(charPos,stairsPos,mapSize,gameMap,probability)
 #checks to see if block is moveable to or has to be mined
 def mineBlock(movingTo,gameMap):
+    # if enter stair tile
     if (gameMap[movingTo[0]][movingTo[1]]==5):
         #if the block is stairs go down
         charPos = lvlGen()
     else: 
         if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
             return True
+        # if enetered combat with enemy tile
         elif gameMap[movingTo[0]][movingTo[1]]==6:
-            fightScreen(monster=gameMap[movingTo[0]][movingTo[1]])
-            return False
+            outcome = fightScreen(monster=gameMap[movingTo[0]][movingTo[1]])
+            gameMap[movingTo[0]][movingTo[1]]=4
+            return outcome
             
         else:
             #adding collected material to inventory
@@ -189,8 +210,8 @@ while running:
                 pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
             elif gameMap[i][j]==6:
                 pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                pygame.draw.circle(screen, (200, 0, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
-    pygame.draw.circle(screen, (0, 100, 5), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
+                pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
+    pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
     resourcesText(font)
     playerHP(font)
     # Look at every event in the queue

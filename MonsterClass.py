@@ -2,10 +2,10 @@ class Goblin:
     HP=0
     ATK=0
     POS=[]
-    def __init__(self,ATK,HP,POS):
-        self.ATK = 1
-        self.HP = 1
-        self.POS=POS
+    def __init__(self,ATK=1,HP=3):
+        self.ATK = ATK
+        self.HP = HP
+        #self.POS=POS
     
     def takeDamage(self,damage):
         if (self.HP>0):
