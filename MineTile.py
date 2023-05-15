@@ -67,7 +67,7 @@ def fightScreen(monster):
         enemy.HP-=Player.showATK()
         Player.HP-=enemy.showATK()
     
-    while battling and (Player.HP > 0 and enemy.HP > 0):
+    while battling:
         if (Player.showHP() == 0):
             return False
         if (enemy.showHP() == 0):
@@ -79,6 +79,13 @@ def fightScreen(monster):
             # Was it the Escape key? If so, stop the loop.
                 if event.key == K_ESCAPE:
                     battling = False
+        
+        #player sprit location
+        pygame.draw.circle(screen, (0, 0, 255), (125, 400), 100)
+        #enemy Sprite location
+        pygame.draw.circle(screen, (0, 255, 0), (550, 350), 100)
+        #player hot bar
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, Y - 200, X, Y))
         playerHP(font)
         monsterHP(enemy,font)
         b1 = Button(100, Y - 75 , 200, 50, screen, 'Attack', attack)
@@ -91,12 +98,13 @@ def fightScreen(monster):
 
     
 #map generating
-def lvlGen():
+def lvlGen(Pos):
     stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
+    charPos=Pos
     while (stairsPos==charPos):
         stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
     generateMap(charPos,stairsPos,mapSize,gameMap,probability)
-    return charPos
+    
 
 def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
     for i in range(mapSize):
@@ -131,14 +139,17 @@ def mineBlock(movingTo,gameMap):
     # if enter stair tile
     if (gameMap[movingTo[0]][movingTo[1]]==5):
         #if the block is stairs go down
-        charPos = lvlGen()
+        lvlGen(movingTo)
+        return True
     else: 
         if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
             return True
         # if enetered combat with enemy tile
         elif gameMap[movingTo[0]][movingTo[1]]==6:
             outcome = fightScreen(monster=gameMap[movingTo[0]][movingTo[1]])
-            gameMap[movingTo[0]][movingTo[1]]=4
+            print(outcome)
+            if (outcome == True):
+                gameMap[movingTo[0]][movingTo[1]]=4
             return outcome
             
         else:
