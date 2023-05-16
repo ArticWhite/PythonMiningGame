@@ -95,7 +95,16 @@ def fightScreen(monster):
         for button in objects:
             button.process()
         pygame.display.flip()
-
+#death screen script
+def deathScreen():
+    while True:
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
+        font = pygame.font.Font('freesansbold.ttf', 40)
+        text = font.render('You have Died', True, green, blue) 
+        textRect = text.get_rect()
+        textRect.center = (X // 2, Y // 2)
+        screen.blit(text, textRect)  
+        pygame.display.flip()
     
 #map generating
 def lvlGen(Pos):
@@ -147,7 +156,6 @@ def mineBlock(movingTo,gameMap):
         # if enetered combat with enemy tile
         elif gameMap[movingTo[0]][movingTo[1]]==6:
             outcome = fightScreen(monster=gameMap[movingTo[0]][movingTo[1]])
-            print(outcome)
             if (outcome == True):
                 gameMap[movingTo[0]][movingTo[1]]=4
             return outcome
@@ -197,6 +205,8 @@ screen = pygame.display.set_mode([X, Y])
 running = True
 
 while running:
+    if Player.showHP()<=0:
+        break
     screen.fill((0, 0, 0))
     # Did the user click the window close button?
     for event in pygame.event.get():
@@ -270,5 +280,7 @@ while running:
 
     # Flip the display
     pygame.display.flip()
+#death screen
+deathScreen()
 # Done! Time to quit.
 pygame.quit()
