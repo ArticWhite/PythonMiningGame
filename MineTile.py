@@ -95,9 +95,31 @@ def fightScreen(monster):
         for button in objects:
             button.process()
         pygame.display.flip()
+def mainmenu():
+    running = True
+    while running:
+        objects=[]
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
+        font = pygame.font.Font('freesansbold.ttf', 40)
+        text = font.render('Mining Legend', True, green, blue) 
+        textRect = text.get_rect()
+        textRect.center = (X // 2, 100)
+        screen.blit(text, textRect)
+        b1 = Button(X // 2-100, 200 , 200, 50, screen, 'Play', gameLoop)
+        objects.append(b1)
+        #objects.append(b2)
+        for button in objects:
+            button.process()  
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                # Was it the Escape key? If so, stop the loop.
+                if event.key == K_ESCAPE:
+                    running = False
 #death screen script
 def deathScreen():
-    while True:
+    running = True
+    while running:
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
         font = pygame.font.Font('freesansbold.ttf', 40)
         text = font.render('You have Died', True, green, blue) 
@@ -105,7 +127,90 @@ def deathScreen():
         textRect.center = (X // 2, Y // 2)
         screen.blit(text, textRect)  
         pygame.display.flip()
-    
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                # Was it the Escape key? If so, stop the loop.
+                if event.key == K_ESCAPE:
+                    running = False
+def game():
+    running = True
+    while running:
+        if Player.showHP()<=0:
+            break
+        screen.fill((0, 0, 0))
+        # Did the user click the window close button?
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        # Fill the background with white
+        
+        # Draw map tiles
+        for i in range(0,mapSize,1):
+            for j in range(0,mapSize,1):
+                if gameMap[i][j]==0:
+                    pygame.draw.rect(screen, (128, 128, 128), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                elif gameMap[i][j]==1:
+                    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                elif gameMap[i][j]==2:
+                    pygame.draw.rect(screen, (175, 50, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                elif gameMap[i][j]==3:
+                    pygame.draw.rect(screen, (255, 215, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                elif gameMap[i][j]==4:
+                    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                elif gameMap[i][j]==5:
+                    pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                elif gameMap[i][j]==6:
+                    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
+        pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
+        resourcesText(font)
+        playerHP(font)
+        # Look at every event in the queue
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                # Was it the Escape key? If so, stop the loop.
+                if event.key == K_ESCAPE:
+                    running = False
+                elif event.key == K_i:
+                    inInv=True
+                    #inventory
+                    while inInv:
+                        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
+                        for event in pygame.event.get():
+                            if event.type == KEYDOWN:
+                            # Was it the Escape key? If so, stop the loop.
+                                if event.key == K_i:
+                                    inInv = False
+                        #buttons created here for inventory
+                        objects = []
+                        resourcesText(font)
+                        inventoryText(font)
+                        b1 = Button(30, 50, 400, 100, screen, 'Smelt Iron', Player.smeltIron)
+                        b2 = Button(30, 150, 400, 100, screen, 'Smelt Gold', Player.smeltGold)
+                        objects.append(b1)
+                        objects.append(b2)
+                        for object in objects:
+                            object.process()
+                        pygame.display.flip()
+                        #resourced text
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            moveUp(charPos,gameMap)
+            time.sleep(0.2)
+        if keys[pygame.K_DOWN]:
+            moveDown(charPos,gameMap)
+            time.sleep(0.2)
+        if keys[pygame.K_LEFT]:
+            moveLeft(charPos,gameMap)
+            time.sleep(0.2)
+        if keys[pygame.K_RIGHT]:
+            moveRight(charPos,gameMap)
+            time.sleep(0.2)
+        # Flip the display
+        pygame.display.flip()
+def gameLoop():
+    game()
+    deathScreen()
 #map generating
 def lvlGen(Pos):
     stairsPos=[random.randint(0,mapSize-1),random.randint(0,mapSize-1)]
@@ -202,85 +307,10 @@ font = pygame.font.Font('freesansbold.ttf', 10)
 
 #set up the drawing screen
 screen = pygame.display.set_mode([X, Y])
-running = True
 
-while running:
-    if Player.showHP()<=0:
-        break
-    screen.fill((0, 0, 0))
-    # Did the user click the window close button?
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    # Fill the background with white
-    
-    # Draw map tiles
-    for i in range(0,mapSize,1):
-        for j in range(0,mapSize,1):
-            if gameMap[i][j]==0:
-                pygame.draw.rect(screen, (128, 128, 128), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-            elif gameMap[i][j]==1:
-                pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-            elif gameMap[i][j]==2:
-                pygame.draw.rect(screen, (175, 50, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-            elif gameMap[i][j]==3:
-                pygame.draw.rect(screen, (255, 215, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-            elif gameMap[i][j]==4:
-                pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-            elif gameMap[i][j]==5:
-                pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-            elif gameMap[i][j]==6:
-                pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
-    pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
-    resourcesText(font)
-    playerHP(font)
-    # Look at every event in the queue
-    for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            # Was it the Escape key? If so, stop the loop.
-            if event.key == K_ESCAPE:
-                running = False
-            elif event.key == K_i:
-                inInv=True
-                #inventory
-                while inInv:
-                    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
-                    for event in pygame.event.get():
-                        if event.type == KEYDOWN:
-                        # Was it the Escape key? If so, stop the loop.
-                            if event.key == K_i:
-                                inInv = False
-                    #buttons created here for inventory
-                    objects = []
-                    resourcesText(font)
-                    inventoryText(font)
-                    b1 = Button(30, 50, 400, 100, screen, 'Smelt Iron', Player.smeltIron)
-                    b2 = Button(30, 150, 400, 100, screen, 'Smelt Gold', Player.smeltGold)
-                    objects.append(b1)
-                    objects.append(b2)
-                    for object in objects:
-                        object.process()
-                    pygame.display.flip()
-                    #resourced text
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        moveUp(charPos,gameMap)
-        time.sleep(0.2)
-    if keys[pygame.K_DOWN]:
-        moveDown(charPos,gameMap)
-        time.sleep(0.2)
-    if keys[pygame.K_LEFT]:
-        moveLeft(charPos,gameMap)
-        time.sleep(0.2)
-    if keys[pygame.K_RIGHT]:
-        moveRight(charPos,gameMap)
-        time.sleep(0.2)
-    
 
-    # Flip the display
-    pygame.display.flip()
+#game loop
+mainmenu()
 #death screen
-deathScreen()
 # Done! Time to quit.
 pygame.quit()
