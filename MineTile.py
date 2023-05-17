@@ -335,17 +335,22 @@ def moveEnemies():
                     if (len(possible)>0):
                         num=random.choice(possible)
                         if (num == 0):
-                            gameMap[i][j+1]==gameMap[i][j]
+                            gameMap[i][j+1]=gameMap[i][j]
                             gameMap[i][j]=4
+                            print(gameMap[i][j+1])
                         if (num == 1):
-                            gameMap[i][j-1]==gameMap[i][j]
+                            gameMap[i][j-1]=gameMap[i][j]
                             gameMap[i][j]=4
+                            print(gameMap[i][j-1])
                         if (num == 2):
-                            gameMap[i-1][j]==gameMap[i][j]
+                            gameMap[i-1][j]=gameMap[i][j]
                             gameMap[i][j]=4
+                            print(gameMap[i-1][j])
                         if (num == 3):
-                            gameMap[i+1][j]==gameMap[i][j]
+                            gameMap[i+1][j]=gameMap[i][j]
                             gameMap[i][j]=4
+                            print(gameMap[i+1][j])
+                    print(str(gameMap[i][j])+" i, "+"j")
                     
                         
 
