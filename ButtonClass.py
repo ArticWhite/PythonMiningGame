@@ -5,7 +5,7 @@ import random
 import time
 class Button():
                         def __init__(self, x, y, width, height, screen, buttonText='Button', onclickFunction=None, onePress=False):
-                            fontInv = pygame.font.SysFont('Arial', 40)
+                            fontInv = pygame.font.SysFont('Arial', 35)
                             self.x = x
                             self.y = y
                             self.width = width

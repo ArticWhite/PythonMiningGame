@@ -1,7 +1,9 @@
+from random import randint
 class Goblin:
     HP=0
     ATK=0
     POS=[]
+    EXP = randint(2,3)
     def __init__(self,ATK=1,HP=3):
         self.ATK = ATK
         self.HP = HP
@@ -14,3 +16,5 @@ class Goblin:
         return self.HP
     def showATK(self):
         return self.ATK
+    def showEXP(self):
+        return self.EXP

@@ -21,6 +21,7 @@ white = (255, 255, 255)
 green = (0, 255, 0)
 blue = (0, 0, 128)
 mapSize = 12
+enemList=[6]
 #game object stone #, coal *, iron @, gold $
 #map tile probablity
 probability=[75,87,97,99,100]
@@ -68,9 +69,10 @@ def fightScreen(monster):
         Player.HP-=enemy.showATK()
     
     while battling:
-        if (Player.showHP() == 0):
+        if (Player.showHP() <= 0):
             return False
-        if (enemy.showHP() == 0):
+        if (enemy.showHP() <= 0):
+            Player.addEXP(enemy.showEXP())
             return True
         objects=[]
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
@@ -107,7 +109,6 @@ def mainmenu():
         screen.blit(text, textRect)
         b1 = Button(X // 2-100, 200 , 200, 50, screen, 'Play', gameLoop)
         objects.append(b1)
-        #objects.append(b2)
         for button in objects:
             button.process()  
         pygame.display.flip()
@@ -134,6 +135,7 @@ def deathScreen():
                     running = False
 def game():
     running = True
+    lvlGen(charPos)
     while running:
         if Player.showHP()<=0:
             break
@@ -185,10 +187,23 @@ def game():
                         objects = []
                         resourcesText(font)
                         inventoryText(font)
-                        b1 = Button(30, 50, 400, 100, screen, 'Smelt Iron', Player.smeltIron)
-                        b2 = Button(30, 150, 400, 100, screen, 'Smelt Gold', Player.smeltGold)
+                        b1 = Button(30, 50, 250, 75, screen, 'Smelt Iron', Player.smeltIron)
+                        b2 = Button(30, 150, 250, 75, screen, 'Smelt Gold', Player.smeltGold)
+                        b3 = Button(30, 250, 250, 75, screen, 'Craft Rock', Player.craftRock)
+                        b4 = Button(30, 350, 250, 75, screen, 'Craft Dagger', Player.craftDagger)
+                        b5 = Button(30, 450, 250, 75, screen, 'Craft Sword', Player.craftSword)
+                        b6 = Button(300, 50, 250, 75, screen, 'Equip Rock', Player.equipRock)
+                        b7 = Button(300, 150, 250, 75, screen, 'Equip Dagger', Player.equipDagger)
+                        b8 = Button(300,250, 250, 75, screen, 'Equip Sword', Player.equipSword)
+                        
                         objects.append(b1)
                         objects.append(b2)
+                        objects.append(b3)
+                        objects.append(b4)
+                        objects.append(b5)
+                        objects.append(b6)
+                        objects.append(b7)
+                        objects.append(b8)
                         for object in objects:
                             object.process()
                         pygame.display.flip()
@@ -196,15 +211,19 @@ def game():
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             moveUp(charPos,gameMap)
+            moveEnemies()
             time.sleep(0.2)
         if keys[pygame.K_DOWN]:
             moveDown(charPos,gameMap)
+            moveEnemies()
             time.sleep(0.2)
         if keys[pygame.K_LEFT]:
             moveLeft(charPos,gameMap)
+            moveEnemies()
             time.sleep(0.2)
         if keys[pygame.K_RIGHT]:
             moveRight(charPos,gameMap)
+            moveEnemies()
             time.sleep(0.2)
         # Flip the display
         pygame.display.flip()
@@ -295,6 +314,41 @@ def moveRight(charPos,gameMap):
     if (charPos[0]!=len(gameMap[0])-1):
         if (mineBlock((charPos[0]+1,charPos[1]),gameMap)):
             charPos[0]+=1
+#check for enemies on the map and see what is a valid move
+def moveEnemies():
+    wandering = True
+    if (wandering):
+        for i in range(len(gameMap)):
+            for j in range(len(gameMap[0])):
+                if(gameMap[i][j] in enemList):
+                    possible=[0,1,2,3]
+                    #check to see if valid move is available then move randomly
+                    if (j >= len(gameMap[0])-1 or gameMap[i][j+1]!=4):
+                        possible.remove(0)
+                    if (j <=0 or gameMap[i][j-1]!=4):
+                        possible.remove(1)
+                    if (i <= 0 or gameMap[i-1][j]!=4):
+                        possible.remove(2)
+                    if (i >=  len(gameMap)-1 or gameMap[i+1][j]!=4):
+                        possible.remove(3)
+                    #randomly select possible positions
+                    if (len(possible)>0):
+                        num=random.choice(possible)
+                        if (num == 0):
+                            gameMap[i][j+1]==gameMap[i][j]
+                            gameMap[i][j]=4
+                        if (num == 1):
+                            gameMap[i][j-1]==gameMap[i][j]
+                            gameMap[i][j]=4
+                        if (num == 2):
+                            gameMap[i-1][j]==gameMap[i][j]
+                            gameMap[i][j]=4
+                        if (num == 3):
+                            gameMap[i+1][j]==gameMap[i][j]
+                            gameMap[i][j]=4
+                    
+                        
+
 
 #helper method for smelting ore for buttons
 #character class generated
