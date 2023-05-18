@@ -148,49 +148,7 @@ def game():
         # player hub details
         resourcesText(font)
         playerHP(font)
-        # Look at every event in the queue
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                # Was it the Escape key? If so, stop the loop.
-                if event.key == K_ESCAPE:
-                    running = False
-                elif event.key == K_i:
-                    inInv=True
-                    #inventory
-                    while inInv:
-                        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
-                        for event in pygame.event.get():
-                            if event.type == KEYDOWN:
-                            # Was it the Escape key? If so, stop the loop.
-                                if event.key == K_i:
-                                    inInv = False
-                        #buttons created here for inventory
-                        objects = []
-                        resourcesText(font)
-                        inventoryText(font)
-                        b1 = Button(30, 50, 250, 75, screen, 'Smelt Iron', Player.smeltIron)
-                        b2 = Button(30, 150, 250, 75, screen, 'Smelt Gold', Player.smeltGold)
-                        b3 = Button(30, 250, 250, 75, screen, 'Craft Rock', Player.craftRock)
-                        b4 = Button(30, 350, 250, 75, screen, 'Craft Dagger', Player.craftDagger)
-                        b5 = Button(30, 450, 250, 75, screen, 'Craft Sword', Player.craftSword)
-                        b6 = Button(300, 50, 250, 75, screen, 'Equip Rock', Player.equipRock)
-                        b7 = Button(300, 150, 250, 75, screen, 'Equip Dagger', Player.equipDagger)
-                        b8 = Button(300,250, 250, 75, screen, 'Equip Sword', Player.equipSword)
-                        
-                        objects.append(b1)
-                        objects.append(b2)
-                        objects.append(b3)
-                        objects.append(b4)
-                        objects.append(b5)
-                        objects.append(b6)
-                        objects.append(b7)
-                        objects.append(b8)
-                        for object in objects:
-                            object.process()
-                        pygame.display.flip()
-                        #resourced text
-                    screen.fill((50, 0, 100))
-                    drawMap()
+        #movement for character
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             moveUp(charPos,gameMap)
@@ -220,6 +178,47 @@ def game():
             screen.fill((50, 0, 100))
             drawMap()
             time.sleep(0.2)
+        # Look at every event in the queue
+        if keys[pygame.K_ESCAPE]:
+            running = False
+        if keys[pygame.K_i]:
+            inInv=True
+            #inventory
+            while inInv:
+                pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
+                #buttons created here for inventory
+                objects = []
+                resourcesText(font)
+                inventoryText(font)
+                b1 = Button(30, 50, 250, 75, screen, 'Smelt Iron', Player.smeltIron)
+                b2 = Button(30, 150, 250, 75, screen, 'Smelt Gold', Player.smeltGold)
+                b3 = Button(30, 250, 250, 75, screen, 'Craft Rock', Player.craftRock)
+                b4 = Button(30, 350, 250, 75, screen, 'Craft Dagger', Player.craftDagger)
+                b5 = Button(30, 450, 250, 75, screen, 'Craft Sword', Player.craftSword)
+                b6 = Button(300, 50, 250, 75, screen, 'Equip Rock', Player.equipRock)
+                b7 = Button(300, 150, 250, 75, screen, 'Equip Dagger', Player.equipDagger)
+                b8 = Button(300,250, 250, 75, screen, 'Equip Sword', Player.equipSword)
+                
+                objects.append(b1)
+                objects.append(b2)
+                objects.append(b3)
+                objects.append(b4)
+                objects.append(b5)
+                objects.append(b6)
+                objects.append(b7)
+                objects.append(b8)
+                for object in objects:
+                    object.process()
+                pygame.display.flip()
+                #leave inventory
+                for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                    # Was it the Escape key? If so, stop the loop.
+                        if event.key == K_i:
+                            inInv = False
+                            time.sleep(0.1)
+            screen.fill((50, 0, 100))
+            drawMap()
         # Flip the display
         pygame.display.flip()
 def gameLoop():
@@ -289,7 +288,7 @@ def drawMap():
     if fogOfWar:  
         for i in range(0,mapSize,1):
             for j in range(0,mapSize,1):
-                if ((i < len(gameMap)-1) and (gameMap[i+1][j] == 4) or ((i > 0) and (gameMap[i-1][j] == 4)) or ((j > 0 ) and (gameMap[i][j-1] == 4)) or (j < len(gameMap[0])-1  and (gameMap[i][j+1] == 4))):
+                if ((i < len(gameMap)-1) and (gameMap[i+1][j] == 4) or ((i > 0) and (gameMap[i-1][j] == 4)) or ((j > 0 ) and (gameMap[i][j-1] == 4)) or (j < len(gameMap[0])-1  and (gameMap[i][j+1] == 4)) or gameMap[i][j] == 4):
                     if gameMap[i][j]==0:
                         pygame.draw.rect(screen, (128, 128, 128), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
                     elif gameMap[i][j]==1:
@@ -305,7 +304,6 @@ def drawMap():
                     elif gameMap[i][j]==6:
                         pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
                         pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
-        pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(charPos[0]+1), 50*(charPos[1]+1), 50, 50))
         pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
 #checks to see if block is moveable to or has to be mined
 def mineBlock(movingTo,gameMap):
