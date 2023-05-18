@@ -135,36 +135,17 @@ def deathScreen():
                     running = False
 def game():
     running = True
+    screen.fill((0, 0, 0))
     lvlGen(charPos)
+    drawMap()
     while running:
         if Player.showHP()<=0:
             break
-        screen.fill((0, 0, 0))
         # Did the user click the window close button?
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        # Fill the background with white
-        
-        # Draw map tiles
-        for i in range(0,mapSize,1):
-            for j in range(0,mapSize,1):
-                if gameMap[i][j]==0:
-                    pygame.draw.rect(screen, (128, 128, 128), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                elif gameMap[i][j]==1:
-                    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                elif gameMap[i][j]==2:
-                    pygame.draw.rect(screen, (175, 50, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                elif gameMap[i][j]==3:
-                    pygame.draw.rect(screen, (255, 215, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                elif gameMap[i][j]==4:
-                    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                elif gameMap[i][j]==5:
-                    pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                elif gameMap[i][j]==6:
-                    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
-                    pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
-        pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
+        # player hub details
         resourcesText(font)
         playerHP(font)
         # Look at every event in the queue
@@ -212,18 +193,26 @@ def game():
         if keys[pygame.K_UP]:
             moveUp(charPos,gameMap)
             moveEnemies()
+            # Draw map tiles
+            drawMap()
             time.sleep(0.2)
         if keys[pygame.K_DOWN]:
             moveDown(charPos,gameMap)
             moveEnemies()
+            # Draw map tiles
+            drawMap()
             time.sleep(0.2)
         if keys[pygame.K_LEFT]:
             moveLeft(charPos,gameMap)
             moveEnemies()
+            # Draw map tiles
+            drawMap()
             time.sleep(0.2)
         if keys[pygame.K_RIGHT]:
             moveRight(charPos,gameMap)
             moveEnemies()
+            # Draw map tiles
+            drawMap()
             time.sleep(0.2)
         # Flip the display
         pygame.display.flip()
@@ -260,13 +249,35 @@ def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
                 elif probability[4]>=number:
                     num=random.randint(1,2)
                     if (num == 1):
+                        #open space
                         gameMap[i][j]=4
                     else:
+                        #enemy
                         gameMap[i][j]=6
             else:
+                #player position open space
                 gameMap[i][j]=4
     gameMap[stairsPos[0]][stairsPos[1]]=5
-generateMap(charPos,stairsPos,mapSize,gameMap,probability)
+#draw map tiles, player and monsters
+def drawMap():
+            for i in range(0,mapSize,1):
+                for j in range(0,mapSize,1):
+                    if gameMap[i][j]==0:
+                        pygame.draw.rect(screen, (128, 128, 128), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    elif gameMap[i][j]==1:
+                        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    elif gameMap[i][j]==2:
+                        pygame.draw.rect(screen, (175, 50, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    elif gameMap[i][j]==3:
+                        pygame.draw.rect(screen, (255, 215, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    elif gameMap[i][j]==4:
+                        pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    elif gameMap[i][j]==5:
+                        pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    elif gameMap[i][j]==6:
+                        pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                        pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
+            pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
 #checks to see if block is moveable to or has to be mined
 def mineBlock(movingTo,gameMap):
     # if enter stair tile
@@ -335,22 +346,42 @@ def moveEnemies():
                     if (len(possible)>0):
                         num=random.choice(possible)
                         if (num == 0):
-                            gameMap[i][j+1]=gameMap[i][j]
-                            gameMap[i][j]=4
-                            print(gameMap[i][j+1])
+                            if (charPos==[i,j+1]):
+                                outcome = fightScreen(monster=gameMap[i][j])
+                                if (outcome):
+                                    gameMap[i][j]=4
+                            else:
+                                gameMap[i][j+1]=gameMap[i][j]
+                                gameMap[i][j]=4
+                            print([i,j+1])
                         if (num == 1):
-                            gameMap[i][j-1]=gameMap[i][j]
-                            gameMap[i][j]=4
-                            print(gameMap[i][j-1])
+                            if (charPos==[i,j-1]):
+                                outcome = fightScreen(monster=gameMap[i][j])
+                                if (outcome):
+                                    gameMap[i][j]=4
+                            else:
+                                gameMap[i][j-1]=gameMap[i][j]
+                                gameMap[i][j]=4
+                            print([i,j-1])
                         if (num == 2):
-                            gameMap[i-1][j]=gameMap[i][j]
-                            gameMap[i][j]=4
-                            print(gameMap[i-1][j])
+                            if (charPos==[i-1,j]):
+                                outcome = fightScreen(monster=gameMap[i][j])
+                                if (outcome):
+                                    gameMap[i][j]=4
+                            else:
+                                gameMap[i-1][j]=gameMap[i][j]
+                                gameMap[i][j]=4
+                            print([i-1,j])
                         if (num == 3):
-                            gameMap[i+1][j]=gameMap[i][j]
-                            gameMap[i][j]=4
-                            print(gameMap[i+1][j])
-                    print(str(gameMap[i][j])+" i, "+"j")
+                            if (charPos==[i+1,j]):
+                                outcome = fightScreen(monster=gameMap[i][j])
+                                if (outcome):
+                                    gameMap[i][j]=4
+                            else:
+                                gameMap[i+1][j]=gameMap[i][j]
+                                gameMap[i][j]=4
+                            print([i+1,j])
+                        
                     
                         
 
