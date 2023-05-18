@@ -328,10 +328,11 @@ def moveRight(charPos,gameMap):
 #check for enemies on the map and see what is a valid move
 def moveEnemies():
     wandering = True
+    alreadyMoved=[]
     if (wandering):
         for i in range(len(gameMap)):
             for j in range(len(gameMap[0])):
-                if(gameMap[i][j] in enemList):
+                if(gameMap[i][j] in enemList and [i,j] not in alreadyMoved):
                     possible=[0,1,2,3]
                     #check to see if valid move is available then move randomly
                     if (j >= len(gameMap[0])-1 or gameMap[i][j+1]!=4):
@@ -354,6 +355,7 @@ def moveEnemies():
                                 gameMap[i][j+1]=gameMap[i][j]
                                 gameMap[i][j]=4
                             print([i,j+1])
+                            alreadyMoved.append([i,j+1])
                         if (num == 1):
                             if (charPos==[i,j-1]):
                                 outcome = fightScreen(monster=gameMap[i][j])
@@ -363,6 +365,7 @@ def moveEnemies():
                                 gameMap[i][j-1]=gameMap[i][j]
                                 gameMap[i][j]=4
                             print([i,j-1])
+                            alreadyMoved.append([i,j-1])
                         if (num == 2):
                             if (charPos==[i-1,j]):
                                 outcome = fightScreen(monster=gameMap[i][j])
@@ -372,6 +375,7 @@ def moveEnemies():
                                 gameMap[i-1][j]=gameMap[i][j]
                                 gameMap[i][j]=4
                             print([i-1,j])
+                            alreadyMoved.append([i-1,j])
                         if (num == 3):
                             if (charPos==[i+1,j]):
                                 outcome = fightScreen(monster=gameMap[i][j])
@@ -381,6 +385,8 @@ def moveEnemies():
                                 gameMap[i+1][j]=gameMap[i][j]
                                 gameMap[i][j]=4
                             print([i+1,j])
+                            alreadyMoved.append([i+1,j])
+                        
                         
                     
                         
