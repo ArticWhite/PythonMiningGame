@@ -21,10 +21,10 @@ white = (255, 255, 255)
 green = (0, 255, 0)
 blue = (0, 0, 128)
 mapSize = 12
-enemList=[6]
+enemList=[6,7]
 #game object stone #, coal *, iron @, gold $
 #map tile probablity
-probability=[75,87,97,99,100]
+probability=[65,77,87,89,100]
 # objects 0 is stone, 1 is coal, 2 is iron, 3 gold 4 is open space, and 5 is stairs
 #map array generating
 gameMap = np.zeros((mapSize,mapSize))
@@ -61,6 +61,8 @@ def fightScreen(monster):
     enemy=None
     if (monster==6):
         enemy = MonsterClass.Goblin(1,3)
+    elif (monster == 7):
+        enemy = MonsterClass.HobGoblin(3,6)
     def runAway():
         battling=False
     def attack():
@@ -85,7 +87,10 @@ def fightScreen(monster):
         #player sprit location
         pygame.draw.circle(screen, (0, 0, 255), (125, 400), 100)
         #enemy Sprite location
-        pygame.draw.circle(screen, (0, 255, 0), (550, 350), 100)
+        if (monster == 6):
+            pygame.draw.circle(screen, (0, 255, 0), (550, 350), 100)
+        elif (monster == 7):
+            pygame.draw.circle(screen, (255,0,0), (550, 350), 100)
         #player hot bar
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, Y - 200, X, Y))
         playerHP(font)
@@ -252,13 +257,14 @@ def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
                     gameMap[i][j]=3
                 #spawn open space or goblin
                 elif probability[4]>=number:
-                    num=random.randint(1,2)
-                    if (num == 1):
+                    num=random.randint(1,20)
+                    if (num < 12):
                         #open space
                         gameMap[i][j]=4
-                    else:
-                        #enemy
+                    elif (num <= 18):
                         gameMap[i][j]=6
+                    else:
+                        gameMap[i][j]=7
             else:
                 #player position open space
                 gameMap[i][j]=4
@@ -284,6 +290,9 @@ def drawMap():
                 elif gameMap[i][j]==6:
                     pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
                     pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
+                elif gameMap[i][j]==7:
+                    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    pygame.draw.circle(screen, (255, 0, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
         pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
     if fogOfWar:  
         for i in range(0,mapSize,1):
@@ -304,6 +313,9 @@ def drawMap():
                     elif gameMap[i][j]==6:
                         pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
                         pygame.draw.circle(screen, (0, 255, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
+                    elif gameMap[i][j]==7:
+                        pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                        pygame.draw.circle(screen, (255, 0, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
         pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
 #checks to see if block is moveable to or has to be mined
 def mineBlock(movingTo,gameMap):
