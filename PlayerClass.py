@@ -5,6 +5,7 @@ class Charater:
     EXP=0
     LVL=0
     MAXEXP= 5+5*LVL
+    ARMOR=[0,0,0]
     #resources
     stone = 0
     coal = 0
@@ -14,7 +15,7 @@ class Charater:
     goldIngot=0
     #items
     hand = None
-    items = [["ROCK",0],["DAGGER",0],["SWORD",0]]
+    items = [["ROCK",0],["DAGGER",0],["SWORD",0],["HELMET",0],["CHEST PLATE",0],["IRON PANTS",0]]
     WEAPONS ={
         "ROCK":2,
         "DAGGER":3,
@@ -31,7 +32,19 @@ class Charater:
         self.HP = 8 + 2*self.LVL
         self.ATK = 1
         self.MAXEXP=5+5*self.LVL
-    
+    def reset(self):
+        self.items = [["ROCK",0],["DAGGER",0],["SWORD",0],["HELMET",0],["CHEST PLATE",0],["IRON PANTS",0]]
+        self.stone = 0
+        self.coal = 0
+        self.iron = 0
+        self.ironIngot = 0
+        self.gold = 0
+        self.goldIngot = 0
+        self.EXP = 0
+        self.LVL = 1
+        self.HP = 8 + 2*self.LVL
+        self.ATK = 1
+        self.MAXEXP=5+5*self.LVL
     def addStone(self):
         self.stone+=1
     def addCoal(self):
@@ -90,5 +103,17 @@ class Charater:
         if (self.ironIngot>=30):
             self.ironIngot -=30
             self.items[2][1]+=1
-    
+    def craftHelmet(self):
+        if (self.ironIngot>=10):
+            self.ironIngot -=10
+            self.items[3][1]+=1
+    def craftChestPlate(self):
+        if (self.ironIngot>=30):
+            self.ironIngot -=30
+            self.items[4][1]+=1
+    def craftIornPants(self):
+        if (self.ironIngot>=20):
+            self.ironIngot -=20
+            self.items[5][1]+=1
+
     
