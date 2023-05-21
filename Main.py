@@ -328,7 +328,7 @@ def mineBlock(movingTo,gameMap):
         if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
             return True
         # if enetered combat with enemy tile
-        elif gameMap[movingTo[0]][movingTo[1]]==6:
+        elif gameMap[movingTo[0]][movingTo[1]]==enemList:
             outcome = fightScreen(monster=gameMap[movingTo[0]][movingTo[1]])
             if (outcome == True):
                 gameMap[movingTo[0]][movingTo[1]]=4
