@@ -21,7 +21,7 @@ white = (255, 255, 255)
 green = (0, 255, 0)
 blue = (0, 0, 128)
 mapSize = 12
-enemList=[6,7]
+enemList=[6,7,8]
 #game object stone #, coal *, iron @, gold $
 #map tile probablity
 probability=[65,77,87,89,100]
@@ -62,7 +62,9 @@ def fightScreen(monster):
     if (monster==6):
         enemy = MonsterClass.Goblin(1,3)
     elif (monster == 7):
-        enemy = MonsterClass.HobGoblin(3,6)
+        enemy = MonsterClass.HobGoblin(3,8)
+    elif (monster == 8):
+        enemy = MonsterClass.Troll(6,12)
     def runAway():
         battling=False
     def attack():
@@ -91,6 +93,8 @@ def fightScreen(monster):
             pygame.draw.circle(screen, (0, 255, 0), (550, 350), 100)
         elif (monster == 7):
             pygame.draw.circle(screen, (255,0,0), (550, 350), 100)
+        elif (monster == 8):
+            pygame.draw.circle(screen, (255,0,255), (550, 350), 150)
         #player hot bar
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, Y - 200, X, Y))
         playerHP(font)
@@ -124,6 +128,7 @@ def mainmenu():
                     running = False
 #death screen script
 def deathScreen():
+    Player.reset()
     running = True
     while running:
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
@@ -257,14 +262,19 @@ def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
                     gameMap[i][j]=3
                 #spawn open space or goblin
                 elif probability[4]>=number:
-                    num=random.randint(1,20)
-                    if (num < 12):
+                    num=random.randint(1,50)
+                    if (num < 25):
                         #open space
                         gameMap[i][j]=4
-                    elif (num <= 18):
+                    elif (num <= 35):
+                        #goblin
                         gameMap[i][j]=6
-                    else:
+                    elif (num <= 48):
+                        #hobgoblin
                         gameMap[i][j]=7
+                    else:
+                        #troll
+                        gameMap[i][j]=8
             else:
                 #player position open space
                 gameMap[i][j]=4
@@ -293,6 +303,9 @@ def drawMap():
                 elif gameMap[i][j]==7:
                     pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
                     pygame.draw.circle(screen, (255, 0, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
+                elif gameMap[i][j]==8:
+                    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                    pygame.draw.circle(screen, (100, 0, 100), (50*(i+1)+25, 50*(j+1)+25), 25)
         pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
     if fogOfWar:  
         for i in range(0,mapSize,1):
@@ -316,6 +329,9 @@ def drawMap():
                     elif gameMap[i][j]==7:
                         pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
                         pygame.draw.circle(screen, (255, 0, 0), (50*(i+1)+25, 50*(j+1)+25), 25)
+                    elif gameMap[i][j]==8:
+                        pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(50*(i+1), 50*(j+1), 50, 50))
+                        pygame.draw.circle(screen, (100, 0, 100), (50*(i+1)+25, 50*(j+1)+25), 25)
         pygame.draw.circle(screen, (0, 0, 255), (50*(charPos[0]+1)+25, 50*(charPos[1]+1)+25), 25)
 #checks to see if block is moveable to or has to be mined
 def mineBlock(movingTo,gameMap):
@@ -328,7 +344,7 @@ def mineBlock(movingTo,gameMap):
         if (gameMap[movingTo[0]][movingTo[1]]==4 or gameMap[movingTo[0]][movingTo[1]]==5):
             return True
         # if enetered combat with enemy tile
-        elif gameMap[movingTo[0]][movingTo[1]]==enemList:
+        elif gameMap[movingTo[0]][movingTo[1]] in enemList:
             outcome = fightScreen(monster=gameMap[movingTo[0]][movingTo[1]])
             if (outcome == True):
                 gameMap[movingTo[0]][movingTo[1]]=4
@@ -424,9 +440,7 @@ def moveEnemies():
                                 gameMap[i+1][j]=gameMap[i][j]
                                 gameMap[i][j]=4
                             
-                            alreadyMoved.append([i+1,j])
-                        
-                        
+                            alreadyMoved.append([i+1,j])                       
                     
                         
 
