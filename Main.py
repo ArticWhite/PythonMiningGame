@@ -82,12 +82,13 @@ def fightScreen(monster):
             return True
         objects=[]
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, X, Y))
+        ''' removed option to run away from fights
         for event in pygame.event.get():
             if event.type == KEYDOWN:
             # Was it the Escape key? If so, stop the loop.
                 if event.key == K_ESCAPE:
                     battling = False
-        
+        '''
         #player sprit location
         pygame.draw.circle(screen, (0, 0, 255), (125, 400), 100)
         #enemy Sprite location
