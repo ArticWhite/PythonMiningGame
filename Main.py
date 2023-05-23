@@ -55,7 +55,11 @@ def monsterHP(enemy,font):
     textRect = text.get_rect()
     textRect.center = (400, 20)
     screen.blit(text, textRect)   
-
+def playerEXP(font):
+    text = font.render("EXP:"+"("+str(Player.EXP)+"/"+str(Player.MAXEXP)+")", True, green, blue) 
+    textRect = text.get_rect()
+    textRect.center = (600, 20)
+    screen.blit(text, textRect) 
 def fightScreen(monster):
     battling = True
     enemy=None
@@ -65,8 +69,6 @@ def fightScreen(monster):
         enemy = MonsterClass.HobGoblin(3,8)
     elif (monster == 8):
         enemy = MonsterClass.Troll(6,12)
-    def runAway():
-        battling=False
     def attack():
         time.sleep(0.1)
         enemy.HP-=Player.showATK()
@@ -99,6 +101,7 @@ def fightScreen(monster):
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, Y - 200, X, Y))
         playerHP(font)
         monsterHP(enemy,font)
+        playerEXP(font)
         b1 = Button(100, Y - 75 , 200, 50, screen, 'Attack', attack)
         #b2 = Button(325, Y - 75, 200, 50, screen, 'RUN', runAway)
         objects.append(b1)
@@ -158,6 +161,7 @@ def game():
         # player hub details
         resourcesText(font)
         playerHP(font)
+        playerEXP(font)
         #movement for character
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
@@ -266,7 +270,7 @@ def generateMap(charPos,stairsPos,mapSize,gameMap,probability):
                     if (num < 25):
                         #open space
                         gameMap[i][j]=4
-                    elif (num <= 35):
+                    elif (num <= 40):
                         #goblin
                         gameMap[i][j]=6
                     elif (num <= 48):
